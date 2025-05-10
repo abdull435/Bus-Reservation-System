@@ -1,15 +1,27 @@
 import React, { useState } from 'react';
+import GenderDialog from './GenderDialog';
 
 const SeatSelection = () => {
 
-  const [seatColour, setSeatColour] = useState(Array(40).fill('bg-gray-300')); // Initial color is gray
+  const [seatColour, setSeatColour] = useState(Array(40).fill('bg-gray-300')); 
+  const [showDialog, setShowDialog] = useState(false);
+  const [selectedSeatIndex, setSelectedSeatIndex] = useState(null);
 
-  const handleClick = (index) => {
+  const handleSeat = (index) => {
+    setSelectedSeatIndex(index);
+    setShowDialog(true);
+  };
+
+  const handleGender =(gender)=>{
     setSeatColour((prevcolours)=>{
       const newColours=[...prevcolours];
-      newColours[index]=newColours[index]==='bg-gray-300'?'bg-blue-300':'bg-gray-300'
+      newColours[selectedSeatIndex]= gender === 'male' ? 'bg-blue-500' : 'bg-pink-500';
       return newColours;
     })
+
+    setShowDialog(false);
+    setSelectedSeatIndex(null);
+
   };
 
   return (
@@ -20,7 +32,7 @@ const SeatSelection = () => {
         {seatColour.map((color, index) => (
           
           <button
-          onClick={()=>handleClick(index)}
+          onClick={()=>handleSeat(index)}
             value={index}
             className={`w-10 h-10 flex items-center ${color} justify-center  cursor-pointer text-black rounded-lg`}
           >
@@ -34,6 +46,13 @@ const SeatSelection = () => {
         <div>
         <button className='bg-green-300 p-3 rounded-lg'>Reserve Seat</button>
       </div>
+      {showDialog && (
+        <GenderDialog
+          seatNumber={selectedSeatIndex}
+          onSelectGender={handleGender}
+          onClose={() => setShowDialog(false)}
+        />
+      )}
     </div>
   );
 };
