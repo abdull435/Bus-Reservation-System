@@ -72,6 +72,25 @@ app.get('/get-routes', (req, res) => {
   });
 });
 
+app.post('/add-schedule', (req, res) => {
+  const { bus_id, route_id, departure_time, arrival_time, date } = req.body;
+
+  if (!bus_id || !route_id || !departure_time || !arrival_time || !date) {
+    return res.status(400).json({ success: false, message: 'All fields are required' });
+  }
+
+  const sql = 'INSERT INTO schedules (bus_id, route_id, departure_time, arrival_time, date) VALUES (?, ?, ?, ?, ?)';
+
+  db.query(sql, [bus_id, route_id, departure_time, arrival_time, date], (err, result) => {
+    if (err) {
+      console.error('Error adding schedule:', err);
+      return res.status(500).json({ success: false, message: 'Database insert failed' });
+    }
+    
+    res.json({ success: true, message: 'Schedule added successfully', schedule_id: result.insertId });
+  });
+});
+
 app.listen(port,()=>{
     console.log("Server run on http://localhost:"+port);
     
