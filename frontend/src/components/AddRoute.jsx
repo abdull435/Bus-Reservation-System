@@ -13,6 +13,11 @@ const AddRoute = () => {
       return;
     }
 
+    if(fromCity===toCity){
+      alert('Departure and Arrival both are not same')
+      return;
+    }
+
     axios
       .post('http://localhost:3000/add-route', { from_city: fromCity, to_city: toCity },{withCredentials: true})
       .then((response) => {
