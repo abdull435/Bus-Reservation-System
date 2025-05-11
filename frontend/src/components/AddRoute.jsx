@@ -14,7 +14,7 @@ const AddRoute = () => {
     }
 
     axios
-      .post('/add-route', { from_city: fromCity, to_city: toCity },{withCredentials: true})
+      .post('http://localhost:3000/add-route', { from_city: fromCity, to_city: toCity },{withCredentials: true})
       .then((response) => {
         if (response.data.success) {
           alert('Route added successfully');

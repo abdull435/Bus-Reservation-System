@@ -10,7 +10,7 @@ const app=express();
 app.use(express.json());
 
 app.use(cors({
-  origin: 'http://localhost:5173', // your frontend URL
+  origin: 'http://localhost:5173', 
   credentials: true
 }));
 
@@ -28,6 +28,25 @@ app.post('/add-bus', (req, res) => {
       return res.status(500).json({ success: false, message: 'Database insert failed' });
     }
     res.json({ success: true, message: 'Bus added successfully', bus_id: result.insertId });
+  });
+});
+
+app.post('/add-route', (req, res) => {
+  const { from_city, to_city } = req.body;
+
+  if (!from_city || !to_city) {
+    return res.status(400).json({ success: false, message: 'Both cities are required' });
+  }
+
+  const sql = 'INSERT INTO routes (from_city, to_city) VALUES (?, ?)';
+  
+  db.query(sql, [from_city, to_city], (err, result) => {
+    if (err) {
+      console.error('Error adding route:', err);
+      return res.status(500).json({ success: false, message: 'Database insert failed' });
+    }
+    
+    res.json({ success: true, message: 'Route added successfully', route_id: result.insertId });
   });
 });
 
