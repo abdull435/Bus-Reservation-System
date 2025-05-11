@@ -47,7 +47,6 @@ app.post('/add-route', (req, res) => {
     }
 
     if (checkResult.length > 0) {
-      // Route already exists
       return res.status(409).json({ success: false, message: 'Route already exists' });
     }
 
@@ -103,6 +102,20 @@ app.post('/add-schedule', (req, res) => {
     }
     
     res.json({ success: true, message: 'Schedule added successfully', schedule_id: result.insertId });
+  });
+});
+
+app.get('/get-cities', (req, res) => {
+  db.query('SELECT DISTINCT from_city, to_city FROM routes', (err, result) => {
+    if (err) return res.status(500).json({ success: false, error: err });
+    
+    const cities = new Set();
+    result.forEach(row => {
+      cities.add(row.from_city);
+      cities.add(row.to_city);
+    });
+
+    res.json({ success: true, cities: Array.from(cities) });
   });
 });
 
