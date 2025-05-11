@@ -38,6 +38,20 @@ app.post('/add-route', (req, res) => {
     return res.status(400).json({ success: false, message: 'Both cities are required' });
   }
 
+  const checkSql = 'SELECT * FROM routes WHERE from_city = ? AND to_city = ?';
+
+  db.query(checkSql, [from_city, to_city], (checkErr, checkResult) => {
+    if (checkErr) {
+      console.error('Error checking route:', checkErr);
+      return res.status(500).json({ success: false, message: 'Database check failed' });
+    }
+
+    if (checkResult.length > 0) {
+      // Route already exists
+      return res.status(409).json({ success: false, message: 'Route already exists' });
+    }
+
+  
   const sql = 'INSERT INTO routes (from_city, to_city) VALUES (?, ?)';
   
   db.query(sql, [from_city, to_city], (err, result) => {
@@ -48,6 +62,7 @@ app.post('/add-route', (req, res) => {
     
     res.json({ success: true, message: 'Route added successfully', route_id: result.insertId });
   });
+});
 });
 
 app.get('/get-buses', (req, res) => {

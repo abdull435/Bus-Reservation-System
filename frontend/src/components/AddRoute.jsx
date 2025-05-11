@@ -13,13 +13,13 @@ const AddRoute = () => {
       return;
     }
 
-    if(fromCity===toCity){
+    if (fromCity === toCity) {
       alert('Departure and Arrival both are not same')
-      return;
+      return
     }
 
     axios
-      .post('http://localhost:3000/add-route', { from_city: fromCity, to_city: toCity },{withCredentials: true})
+      .post('http://localhost:3000/add-route', { from_city: fromCity, to_city: toCity }, { withCredentials: true })
       .then((response) => {
         if (response.data.success) {
           alert('Route added successfully');
@@ -28,8 +28,12 @@ const AddRoute = () => {
         }
       })
       .catch((error) => {
-        console.error('Error adding route:', error);
-        alert('Failed to add route');
+        if (error.response && error.response.status === 409) {
+          alert('This route already exists.');
+        } else {
+          console.error('Error adding route:', error);
+          alert('Failed to add route');
+        }
       });
   };
 
