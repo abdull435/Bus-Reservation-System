@@ -10,6 +10,31 @@ const AddSchedule = () => {
 
   const [buses, setBuses] = useState([]);
   const [routes, setRoutes] = useState([]);
+  const [error, setError] = useState('');  
+  
+  useEffect(() => {
+    
+    axios.get('http://localhost:3000/get-buses')
+      .then(response => {
+        setBuses(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching buses:', error);
+        setError('Failed to fetch buses');
+      });
+
+    axios.get('http://localhost:3000/get-routes')
+      .then(response => {
+        setRoutes(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching routes:', error);
+        setError('Failed to fetch routes');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   
 
@@ -34,7 +59,6 @@ const AddSchedule = () => {
       .then((response) => {
         if (response.data.success) {
           alert('Schedule added successfully');
-          
           setBusId('');
           setRouteId('');
           setDepartureTime('');
