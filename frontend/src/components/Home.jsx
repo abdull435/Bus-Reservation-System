@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BusSearch = () => {
+const Home = () => {
   return (
     <div className="min-h-screen flex items-center justify-center">
     <div className="max-w-md w-full mx-auto bg-white rounded-xl shadow-md  p-6  mt-[10vh]">
@@ -53,4 +53,4 @@ const BusSearch = () => {
   );
 };
 
-export default BusSearch;
+export default Home;
