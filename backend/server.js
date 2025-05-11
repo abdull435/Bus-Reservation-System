@@ -50,6 +50,17 @@ app.post('/add-route', (req, res) => {
   });
 });
 
+app.get('/get-buses', (req, res) => {
+  const sql = 'SELECT * FROM buses';
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error('Error fetching buses:', err);
+      return res.status(500).json({ success: false, message: 'Database query failed' });
+    }
+    res.json(result);
+  });
+});
+
 app.listen(port,()=>{
     console.log("Server run on http://localhost:"+port);
     
