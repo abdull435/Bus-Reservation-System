@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const ScheduleList = ({ from, to, date }) => {
+const Schedule = ({ from, to, date }) => {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -54,4 +54,4 @@ const ScheduleList = ({ from, to, date }) => {
   );
 };
 
-export default ScheduleList;
+export default Schedule;
