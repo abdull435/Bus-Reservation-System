@@ -1,43 +1,66 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 const Login = () => {
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [message, setMessage] = useState('');
 
-  const handleChange = (e) => {
-    setFormData({...formData, [e.target.name]: e.target.value});
-  };
+    const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:3000/login', formData);
+      const res = await axios.post('http://localhost:3000/login', {
+        email,
+        password
+      },{withCredentials: true});
       if (res.data.success) {
-        setMessage('Login successful!');
-        // You can store user in localStorage or navigate to dashboard
-        // localStorage.setItem("user", JSON.stringify(res.data.user));
+        alert('Login successful!');
+        navigate('/');
       } else {
-        setMessage('Login failed: ' + res.data.message);
+        alert('Invalid credentials');
       }
     } catch (err) {
-      setMessage('Login error: ' + err.message);
+      console.error(err);
+      alert('Error logging in');
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-xl font-bold mb-4">Login</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input type="email" name="email" placeholder="Email" required
-          onChange={handleChange}
-          className="w-full p-2 border rounded" />
-        <input type="password" name="password" placeholder="Password" required
-          onChange={handleChange}
-          className="w-full p-2 border rounded" />
-        <button type="submit" className="w-full bg-green-600 text-white py-2 rounded">Log In</button>
-      </form>
-      {message && <p className="mt-4 text-center text-sm text-red-500">{message}</p>}
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="max-w-md w-full mx-auto bg-white rounded-xl shadow-md p-6">
+        <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">Login</h2>
+        <form onSubmit={handleLogin} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            required
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            required
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md"
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md"
+          >
+            Login
+          </button>
+        </form>
+        <p className="mt-4 text-center">
+          Don’t have an account?{' '}
+          <Link to="/signup" className="text-blue-600 hover:underline">Sign up</Link>
+        </p>
+      </div>
     </div>
   );
 };

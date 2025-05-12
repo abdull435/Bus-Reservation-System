@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const db = require('./db');
+const bcrypt = require('bcrypt');
+const saltRounds =10;
 
 const port=3000;
 
@@ -12,6 +14,13 @@ app.use(express.json());
 app.use(cors({
   origin: 'http://localhost:5173', 
   credentials: true
+}));
+
+app.use(session({
+  secret: 'yourSecretKey',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // set true if using https
 }));
 
 app.post('/add-bus', (req, res) => {
@@ -148,6 +157,78 @@ app.post('/get-seats', (req, res) => {
     }
   );
 });
+
+app.post('/signup', async (req, res) => {
+  const { name, email, password } = req.body;
+  console.log(password);
+  try {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    
+    db.query(
+      'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+      [name, email, hashedPassword],
+      
+      (err, result) => {
+        if (err) {
+          if (err.code === 'ER_DUP_ENTRY') {
+            return res.json({ success: false, message: 'Email already registered' });
+          }
+          return res.status(500).json({ success: false, message: 'DB error' });
+        }
+        res.json({ success: true });
+      }
+    );
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error hashing password' });
+  }
+});
+
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
+    if (err) return res.status(500).json({ success: false, message: 'DB error' });
+
+    if (results.length === 0) {
+      return res.json({ success: false, message: 'Invalid email or password' });
+    }
+
+    const user = results[0];
+
+    try {
+      const match = await bcrypt.compare(password, user.password);
+      if (match) {
+        req.session.user = {
+        id: user.user_id,
+        name: user.name,
+        email: user.email
+    };
+        res.json({ success: true, user: req.session.user });
+      } else {
+        res.json({ success: false, message: 'Invalid email or password' });
+      }
+    } catch (err) {
+      res.status(500).json({ success: false, message: 'Error verifying password' });
+    }
+  });
+});
+
+
+app.get('/check-session', (req, res) => {
+  if (req.session.user) {
+    res.json({ loggedIn: true, user: req.session.user });
+  } else {
+    res.json({ loggedIn: false });
+  }
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.clearCookie('connect.sid'); // Optional: clear cookie
+    res.json({ success: true });
+  });
+});
+
 
 
 app.listen(port,()=>{
