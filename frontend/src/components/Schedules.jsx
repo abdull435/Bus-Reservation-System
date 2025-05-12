@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import SeatSelection from './SeatSelection';
 
 const Schedule = ({ from, to, date }) => {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedScheduleId, setSelectedScheduleId] = useState(null);
 
   useEffect(() => {
     if (!from || !to || !date) return;
@@ -30,6 +32,10 @@ const Schedule = ({ from, to, date }) => {
     });
   }, [from, to, date]);
 
+  const handleViewSeats = (scheduleId) => {
+    setSelectedScheduleId(scheduleId);
+  };
+
   if (loading) return <p className="text-center mt-4">Loading schedules...</p>;
 
   return (
@@ -45,9 +51,18 @@ const Schedule = ({ from, to, date }) => {
               <p><strong>Arrival:</strong> {new Date(schedule.arrival_time).toLocaleTimeString()}</p>
               <p><strong>Date:</strong> {new Date(schedule.date).toLocaleDateString()}</p>
               {/* You can add a button here to view seats */}
-              <button className="mt-2 bg-blue-600 text-white px-4 py-2 rounded">View Seats</button>
+              <button className="mt-2 bg-blue-600 text-white px-4 py-2 rounded cursor-pointer"
+                onClick={() => handleViewSeats(schedule.schedule_id)}
+              >View Seats</button>
             </div>
           ))}
+        </div>
+      )}
+
+      {selectedScheduleId && (
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold mb-2">Seat Selection</h3>
+          <SeatSelection scheduleId={selectedScheduleId} />
         </div>
       )}
     </div>
