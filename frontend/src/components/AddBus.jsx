@@ -49,6 +49,7 @@ const AddBus = () => {
             <label className="block text-gray-700 text-sm font-bold mb-2">Total Seats</label>
             <input
               type="number"
+              max={40}
               value={totalSeats}
               onChange={(e) => setTotalSeats(e.target.value)}
               required

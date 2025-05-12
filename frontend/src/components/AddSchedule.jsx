@@ -11,6 +11,8 @@ const AddSchedule = () => {
   const [buses, setBuses] = useState([]);
   const [routes, setRoutes] = useState([]);
   const [error, setError] = useState('');  
+
+  const today = new Date().toISOString().split("T")[0];
   
   useEffect(() => {
     
@@ -41,6 +43,14 @@ const AddSchedule = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if(departureTime===arrivalTime){
+      alert('Departure and arrival both are not same');
+      return;
+    }
+    if(departureTime>arrivalTime){
+      alert('Departure time is not greater then arrival');
+      return;
+    }
     if (!busId || !routeId || !departureTime || !arrivalTime || !date) {
       alert('Please fill out all fields');
       return;
@@ -119,6 +129,7 @@ const AddSchedule = () => {
             <input
               type="date"
               value={date}
+              min={today}
               onChange={(e) => setDate(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md"

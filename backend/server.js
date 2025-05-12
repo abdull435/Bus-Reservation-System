@@ -229,6 +229,39 @@ app.get('/logout', (req, res) => {
   });
 });
 
+app.post('/reserve-seat', (req, res) => {
+  const { schedule_id, seat_number, gender } = req.body;
+
+  if (!req.session.user) {
+    return res.status(401).json({ success: false, message: 'Not logged in' });
+  }
+
+  const user_id = req.session.user.id;
+
+  // Check if seat already reserved
+  db.query(
+    'SELECT * FROM reservation WHERE schedule_id = ? AND seat_number = ?',
+    [schedule_id, seat_number],
+    (err, results) => {
+      if (err) return res.status(500).json({ success: false, message: 'DB error' });
+      if (results.length > 0) {
+        return res.json({ success: false, message: 'Seat already reserved' });
+      }
+
+      // Insert new reservation
+      db.query(
+        'INSERT INTO reservation (schedule_id, seat_number, is_reserved, gender, user_id) VALUES (?, ?, 1, ?, ?)',
+        [schedule_id, seat_number, gender, user_id],
+        (err2, result2) => {
+          if (err2) return res.status(500).json({ success: false, message: 'DB insert error' });
+          res.json({ success: true });
+        }
+      );
+    }
+  );
+});
+
+
 
 
 app.listen(port,()=>{
