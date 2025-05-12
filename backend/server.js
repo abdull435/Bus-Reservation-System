@@ -119,6 +119,22 @@ app.get('/get-cities', (req, res) => {
   });
 });
 
+app.post('/get-schedules', (req, res) => {
+  const { from_city, to_city, travel_date } = req.body;
+
+  const sql = `
+    SELECT s.*, r.from_city, r.to_city
+    FROM schedules s
+    JOIN routes r ON s.route_id = r.route_id
+    WHERE r.from_city = ? AND r.to_city = ? AND s.date = ?
+  `;
+
+  db.query(sql, [from_city, to_city, travel_date], (err, results) => {
+    if (err) return res.status(500).json({ success: false, error: err });
+    res.json({ success: true, schedules: results });
+  });
+});
+
 app.listen(port,()=>{
     console.log("Server run on http://localhost:"+port);
     
