@@ -135,6 +135,21 @@ app.post('/get-schedules', (req, res) => {
   });
 });
 
+app.post('/get-seats', (req, res) => {
+  const { schedule_id } = req.body;
+
+  db.query(
+    'SELECT seat_number, gender FROM reservation WHERE schedule_id = ? AND is_reserved = 1',
+    [schedule_id],
+    (err, result) => {
+      if (err) return res.status(500).json({ success: false, error: err });
+
+      res.json({ success: true, reservedSeats: result });
+    }
+  );
+});
+
+
 app.listen(port,()=>{
     console.log("Server run on http://localhost:"+port);
     
